@@ -65,7 +65,7 @@
       parameter(maxpix=4500000) 
       real*8 edep,edep2,Dy_2,ipixarea,
      &       omega,theta,phi,rot_inv,xshift,yshift,zshift,
-     &       rho, z_d, dist
+     &       rho, z_d, dist,x_0,y_0
       integer*8 imgmat, imgmodel, binout
       common /scoimg/ edep(maxpix),edep2(maxpix),
      &                Dy_2,ipixarea,
@@ -79,12 +79,12 @@
       integer*8 pix,i,j,ij,k,ijk,pix_0
       real*8 rprima(3),xdet,ydet,zdet
 
- !     integer out2
+      integer out2
 
 
       
- !     out2 = 300
- !     open(out2,file='debug_z_value.dat', status='replace')!, form='formatted')
+      out2 = 300
+      open(out2,file='debug_z_value.dat', status='replace')!, form='formatted')
 
       if (.not.active) return
 
@@ -160,8 +160,11 @@
 					endif
 				endif 
 
-
-
+        if (kpar.eq.2.and.mode.le.-1.and.mode.ge.-3) then 
+          x_0 = x
+          y_0 = y
+          write(out2,'(2(1x,es12.5),i3)') x_0, y_0, mode
+        endif
 			
 				if (kpar.eq.1.and.ilb(1).gt.nlast) then !selection of secondary electrons depositing energy
 					
@@ -201,13 +204,14 @@
 
 			pix_0 = x_0*idx+1.0 +(y_0*idy+1.0-1)*nx  
 
-            do pix = pix_0-100*100, pix_0 + 100*100
+      do pix = pix_0-100*100, pix_0 + 100*100
             
-			if (edeptmp(pix).ge.ethr) then
-                image(pix)  = image(pix) + 1           ! Add one count to this pixel   !Forcei
-    		    image2(pix) = image2(pix) + 1**2
-            endif
-            edeptmp(pix) = 0.0
+        if (edeptmp(pix).ge.ethr.and.pix.ge.ijmax) then
+          write(out2,'(3(1x,es12.5))') pix_0, pix, edeptmp(pix)
+          image(pix)  = image(pix) + 1           ! Add one count to this pixel   !Forcei
+          image2(pix) = image2(pix) + 1**2
+        endif
+        edeptmp(pix) = 0.0
 
 			
 		 enddo
