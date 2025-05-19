@@ -84,7 +84,7 @@
 
       
       out2 = 300
-      open(out2,file='debug_z_value.dat', status='replace')!, form='formatted')
+      open(out2,file='debug_z_value.dat')!, status='replace')!, form='formatted')
 
       if (.not.active) return
 
